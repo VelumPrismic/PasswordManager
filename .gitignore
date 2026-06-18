@@ -1,0 +1,21 @@
+# Virtual environment
+.venv/
+
+# IDE
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Vault data (user-specific)
+*.enc
+*.dat
+salt.bin
+
+# PyInstaller
+build/
+dist/
+*.spec
