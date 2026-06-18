@@ -8,7 +8,11 @@ A secure password management application built with Python and Tkinter.
 - **Password Strength Checker** - Real-time password strength analysis with entropy scoring
 - **Password Vault** - Encrypted storage for all your passwords with master password protection
 
-## Installation
+## Download
+
+Grab the latest `PasswordManager.exe` from the [Releases page](https://github.com/velumprismic/PasswordManager/releases). No Python required, just download and run.
+
+## Run from Source (Developers)
 
 1. Clone the repository:
 ```bash
