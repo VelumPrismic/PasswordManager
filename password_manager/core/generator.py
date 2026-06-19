@@ -3,7 +3,6 @@ import string
 
 
 class PasswordGenerator:
-    """Generate secure random passwords."""
 
     def __init__(self):
         self.uppercase = True
@@ -13,7 +12,6 @@ class PasswordGenerator:
         self.length = 16
 
     def generate(self) -> str:
-        """Generate a password based on current settings."""
         charset = ""
         required_chars = []
 
@@ -49,7 +47,6 @@ class PasswordGenerator:
     def set_options(self, length: int = 16, uppercase: bool = True,
                     lowercase: bool = True, numbers: bool = True,
                     symbols: bool = True):
-        """Set generation options."""
         self.length = max(8, min(64, length))
         self.uppercase = uppercase
         self.lowercase = lowercase

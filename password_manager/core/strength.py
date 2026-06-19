@@ -2,7 +2,6 @@ import re
 
 
 class StrengthChecker:
-    """Evaluate password strength based on entropy and patterns."""
 
     COMMON_PASSWORDS = {
         'password', '123456', '12345678', 'qwerty', 'abc123',
@@ -12,10 +11,6 @@ class StrengthChecker:
     }
 
     def check(self, password: str) -> dict:
-        """
-        Check password strength.
-        Returns dict with score (0-100), label, and details.
-        """
         if not password:
             return {
                 'score': 0,
@@ -27,7 +22,6 @@ class StrengthChecker:
         score = 0
         details = []
 
-        # Length scoring (up to 30 points)
         length = len(password)
         if length >= 16:
             score += 30
@@ -44,7 +38,6 @@ class StrengthChecker:
         else:
             details.append(f'Length: {length} chars (too short)')
 
-        # Character diversity (up to 40 points)
         has_upper = bool(re.search(r'[A-Z]', password))
         has_lower = bool(re.search(r'[a-z]', password))
         has_digit = bool(re.search(r'\d', password))
@@ -62,13 +55,10 @@ class StrengthChecker:
         if has_symbol:
             details.append('Has special characters')
 
-        # Pattern penalties (up to -30 points)
-        # Common password check
         if password.lower() in self.COMMON_PASSWORDS:
             score -= 40
             details.append('WARNING: Common password detected!')
 
-        # Sequential characters (e.g., abc, 123)
         if re.search(r'(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)', password.lower()):
             score -= 10
             details.append('Contains sequential letters')
@@ -77,17 +67,14 @@ class StrengthChecker:
             score -= 10
             details.append('Contains sequential numbers')
 
-        # Repeated characters
         if re.search(r'(.)\1{2,}', password):
             score -= 10
             details.append('Contains repeated characters')
 
-        # All same character type
         if re.fullmatch(r'[A-Z]+', password) or re.fullmatch(r'[a-z]+', password) or re.fullmatch(r'\d+', password):
             score -= 15
             details.append('Only uses one character type')
 
-        # Entropy bonus (up to 30 points)
         charset_size = 0
         if has_upper:
             charset_size += 26
@@ -105,25 +92,23 @@ class StrengthChecker:
             score += entropy_bonus
             details.append(f'Entropy: {entropy:.1f} bits')
 
-        # Clamp score to 0-100
         score = max(0, min(100, score))
 
-        # Determine label and color
         if score >= 80:
             label = 'Very Strong'
-            color = '#a6e3a1'  # Green
+            color = '#a6e3a1'
         elif score >= 60:
             label = 'Strong'
-            color = '#94e2d5'  # Teal
+            color = '#94e2d5'
         elif score >= 40:
             label = 'Fair'
-            color = '#f9e2af'  # Yellow
+            color = '#f9e2af'
         elif score >= 20:
             label = 'Weak'
-            color = '#fab387'  # Orange
+            color = '#fab387'
         else:
             label = 'Very Weak'
-            color = '#f38ba8'  # Red
+            color = '#f38ba8'
 
         return {
             'score': score,

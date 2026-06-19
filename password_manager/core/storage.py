@@ -5,7 +5,6 @@ from .encryption import EncryptionManager
 
 
 class PasswordStorage:
-    """Encrypted JSON file storage for passwords."""
 
     VAULT_FILE = 'vault.enc'
     MASTER_FILE = 'master.dat'
@@ -20,7 +19,6 @@ class PasswordStorage:
         self._entries = []
 
     def setup_master(self, password: str) -> bool:
-        """Set up master password for first time."""
         if os.path.exists(self.master_path):
             return False
 
@@ -39,7 +37,6 @@ class PasswordStorage:
         return True
 
     def unlock(self, password: str) -> bool:
-        """Unlock vault with master password."""
         if not os.path.exists(self.master_path):
             return False
 
@@ -61,18 +58,15 @@ class PasswordStorage:
         return True
 
     def is_setup(self) -> bool:
-        """Check if master password is set up."""
         return os.path.exists(self.master_path)
 
     def _save_entries(self):
-        """Save entries to encrypted file."""
         data = json.dumps(self._entries, indent=2)
         encrypted = self.encryption.encrypt(data)
         with open(self.vault_path, 'wb') as f:
             f.write(encrypted)
 
     def _load_entries(self):
-        """Load entries from encrypted file."""
         if not os.path.exists(self.vault_path):
             self._entries = []
             return
@@ -86,7 +80,6 @@ class PasswordStorage:
             self._entries = []
 
     def add_entry(self, site: str, username: str, password: str, label: str = '') -> int:
-        """Add a new password entry. Returns entry ID."""
         entry = {
             'id': len(self._entries),
             'site': site,
@@ -99,7 +92,6 @@ class PasswordStorage:
         return entry['id']
 
     def update_entry(self, entry_id: int, site: str, username: str, password: str, label: str = '') -> bool:
-        """Update an existing entry."""
         for entry in self._entries:
             if entry['id'] == entry_id:
                 entry['site'] = site
@@ -111,7 +103,6 @@ class PasswordStorage:
         return False
 
     def delete_entry(self, entry_id: int) -> bool:
-        """Delete an entry by ID."""
         for i, entry in enumerate(self._entries):
             if entry['id'] == entry_id:
                 self._entries.pop(i)
@@ -120,14 +111,20 @@ class PasswordStorage:
         return False
 
     def get_all_entries(self) -> list:
-        """Get all stored entries."""
-        return self._entries.copy()
+        return sorted(self._entries.copy(), key=self._sort_key)
 
     def search_entries(self, query: str) -> list:
-        """Search entries by site, username, or label."""
         query = query.lower()
-        return [
+        results = [
             e for e in self._entries
             if query in e['site'].lower() or query in e['username'].lower()
             or query in e.get('label', '').lower()
         ]
+        return sorted(results, key=self._sort_key)
+
+    @staticmethod
+    def _sort_key(entry):
+        site = entry['site'].lower()
+        label = entry.get('label', '').lower()
+        username = entry['username'].lower()
+        return (site, not label, label, username)

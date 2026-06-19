@@ -7,7 +7,6 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
 class EncryptionManager:
-    """Handles encryption/decryption using Fernet (AES-128-CBC)."""
 
     SALT_SIZE = 16
     KEY_ITERATIONS = 100_000
@@ -17,7 +16,6 @@ class EncryptionManager:
         self._fernet = None
 
     def _derive_key(self, password: str, salt: bytes) -> bytes:
-        """Derive a Fernet key from password using PBKDF2."""
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -28,7 +26,6 @@ class EncryptionManager:
         return key
 
     def set_password(self, password: str, salt: bytes = None) -> bytes:
-        """Set encryption key from password. Returns salt for storage."""
         if salt is None:
             salt = os.urandom(self.SALT_SIZE)
         self._key = self._derive_key(password, salt)
@@ -36,27 +33,23 @@ class EncryptionManager:
         return salt
 
     def encrypt(self, data: str) -> bytes:
-        """Encrypt a string and return bytes."""
         if self._fernet is None:
             raise RuntimeError("Encryption key not set. Call set_password() first.")
         return self._fernet.encrypt(data.encode())
 
     def decrypt(self, token: bytes) -> str:
-        """Decrypt bytes and return string."""
         if self._fernet is None:
             raise RuntimeError("Encryption key not set. Call set_password() first.")
         return self._fernet.decrypt(token).decode()
 
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hash a password for storage (SHA-256 with random salt)."""
         salt = os.urandom(16)
         pwd_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100_000)
         return salt.hex() + ':' + pwd_hash.hex()
 
     @staticmethod
     def verify_password(password: str, stored_hash: str) -> bool:
-        """Verify a password against a stored hash."""
         try:
             salt_hex, hash_hex = stored_hash.split(':')
             salt = bytes.fromhex(salt_hex)

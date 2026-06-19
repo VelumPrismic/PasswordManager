@@ -1,71 +1,71 @@
-# Password Manager
+# 🔐 Password Manager
 
-A secure password management application built with Python and Tkinter.
+A secure password management app built with Python and Tkinter. It comes with a password generator, strength checker, and an encrypted vault to store all your credentials locally.
 
-## Features
+## 📦 Technologies Used
 
-- **Password Generator** - Generate secure random passwords with customizable length and character options
-- **Password Strength Checker** - Real-time password strength analysis with entropy scoring
-- **Password Vault** - Encrypted storage for all your passwords with master password protection
+- `Python 3`
+- `Tkinter`
+- `Cryptography (Fernet)`
+- `Pyperclip`
+- `PyInstaller`
 
-## Download
+## 🦄 Features
 
-Grab the latest `PasswordManager.exe` from the [Releases page](https://github.com/velumprismic/PasswordManager/releases). No Python required, just download and run.
+Here's what you can do with Password Manager:
 
-## Run from Source (Developers)
+- **Generate Passwords**: Customize length from 8 to 64 characters and toggle uppercase, lowercase, numbers, and symbols. Copy the result with one click.
 
-1. Clone the repository:
+- **Check Password Strength**: Type or paste a password to get a real-time score out of 100. The checker analyzes entropy, character diversity, common patterns, and detects weak passwords.
+
+- **Store Passwords Securely**: Save your credentials in an encrypted vault protected by a master password. All data is encrypted locally with AES-128-CBC.
+
+- **Organize with Labels**: Add optional labels like "Personal" or "Work" to keep multiple accounts for the same site organized. Entries are automatically sorted by site and label.
+
+- **Search & Manage**: Search through your vault by site, username, or label. Edit or delete entries as needed.
+
+- **Auto-Lock**: The vault locks automatically after 5 minutes of inactivity or when you switch to another tab. You'll need to re-enter your master password to access it again.
+
+- **Copy Quickly**: Copy passwords or usernames individually with dedicated buttons.
+
+## 📚 What I Learned
+
+### 🔐 Cryptography and Security
+
+- **Key Derivation**: I learned how PBKDF2 works to derive encryption keys from passwords, making brute-force attacks harder.
+- **Fernet Encryption**: Understanding symmetric encryption with Fernet and how it handles AES-128-CBC under the hood.
+- **Password Hashing**: Salting and hashing passwords properly before storing them, and why that matters.
+
+### 🧩 Tkinter GUI Development
+
+- **Theming**: Customizing ttk styles to create a dark theme without external libraries.
+- **Layout Management**: Using grid and pack together effectively for clean dialog layouts.
+- **Event Handling**: Binding mouse, keyboard, and notebook tab-change events for auto-lock behavior.
+
+### ⚙️ Password Strength Analysis
+
+- **Entropy Calculation**: Computing password entropy based on character set size and length.
+- **Pattern Detection**: Using regex to find sequential characters, repeated characters, and common passwords.
+
+### 📦 Packaging with PyInstaller
+
+- **Onefile vs Onedir**: The tradeoffs between a single executable and a folder-based build for startup speed.
+
+## 🚦 Running the Project
+
+To run the project in your local environment, follow these steps:
+
+1. Clone the repository to your local machine.
+2. Run `pip install -r requirements.txt` in the project directory to install the required dependencies.
+3. Run `python main.py` to start the application.
+4. The app window will open. Create a master password on first launch to set up your vault.
+
+## 🏗️ Building the Executable
+
+To build a standalone `.exe` file:
+
 ```bash
-git clone https://github.com/yourusername/PasswordManager.git
-cd PasswordManager
+pyinstaller --onefile --windowed --name "PasswordManager" main.py
 ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Run the application:
-```bash
-python main.py
-```
-
-## Features
-
-### Password Generator
-- Customizable length (8-64 characters)
-- Options: Uppercase, Lowercase, Numbers, Symbols
-- One-click copy to clipboard
-- Real-time strength display
-
-### Password Strength Checker
-- Entropy-based scoring (0-100)
-- Detects common passwords, sequential characters, and patterns
-- Visual strength bar with color feedback
-- Detailed analysis breakdown
-
-### Password Vault
-- Master password protection
-- AES encryption (Fernet) for stored passwords
-- Add, edit, and delete password entries
-- Optional labels for organizing accounts
-- Search functionality
-- Auto-lock after 5 minutes of inactivity
-- Locks when switching tabs
-
-## Security
-
-- Master password is hashed with PBKDF2-HMAC-SHA256 (100k iterations)
-- Vault is encrypted using Fernet (AES-128-CBC)
-- Salt is randomly generated and stored separately
-- All data stored locally (no cloud sync)
-
-## Requirements
-
-- Python 3.7+
-- cryptography
-- pyperclip
-
-## License
-
-MIT License
+The executable will be available in the `dist` folder.

@@ -6,9 +6,8 @@ from ..core.generator import PasswordGenerator
 
 
 class VaultTab(ttk.Frame):
-    """Password Vault tab UI."""
 
-    AUTO_LOCK_TIMEOUT = 5 * 60 * 1000  # 5 minutes in milliseconds
+    AUTO_LOCK_TIMEOUT = 5 * 60 * 1000
 
     def __init__(self, parent, theme_colors: dict):
         super().__init__(parent)
@@ -19,49 +18,43 @@ class VaultTab(ttk.Frame):
         self._lock_timer = None
         self._create_widgets()
         self._show_login()
-        self._bind_activity_events()
 
     def _create_widgets(self):
-        # Login frame
         self.login_frame = ttk.Frame(self)
         self._create_login_widgets()
 
-        # Vault frame (hidden initially)
         self.vault_frame = ttk.Frame(self)
         self._create_vault_widgets()
 
     def _bind_activity_events(self):
-        """Bind events that reset the auto-lock timer."""
         for event_type in ['<Motion>', '<KeyPress>', '<ButtonRelease>']:
-            self.bind(event_type, self._reset_lock_timer)
-        self.vault_frame.bind('<Motion>', self._reset_lock_timer)
+            self.vault_frame.bind(event_type, self._reset_lock_timer)
+
+    def _unbind_activity_events(self):
+        for event_type in ['<Motion>', '<KeyPress>', '<ButtonRelease>']:
+            self.vault_frame.unbind(event_type)
 
     def _reset_lock_timer(self, event=None):
-        """Reset the auto-lock timer."""
         if self._lock_timer is not None:
             self.after_cancel(self._lock_timer)
         if self.unlocked:
             self._lock_timer = self.after(self.AUTO_LOCK_TIMEOUT, self._auto_lock)
 
     def _auto_lock(self):
-        """Auto-lock the vault after timeout."""
         if self.unlocked:
             self._lock()
             messagebox.showinfo("Auto-Locked", "Vault locked due to inactivity.")
 
     def _create_login_widgets(self):
-        # Title
         title = ttk.Label(self.login_frame, text="Password Vault", font=('Segoe UI', 16, 'bold'))
         title.pack(pady=(40, 20))
 
         if not self.storage.is_setup():
-            # Setup new master password
             ttk.Label(self.login_frame, text="Create Master Password", font=('Segoe UI', 11)).pack(pady=(0, 10))
             ttk.Label(self.login_frame, text="(This will be used to unlock your vault)").pack(pady=(0, 20))
         else:
             ttk.Label(self.login_frame, text="Enter Master Password", font=('Segoe UI', 11)).pack(pady=20)
 
-        # Password input
         input_frame = ttk.Frame(self.login_frame)
         input_frame.pack(pady=5)
 
@@ -71,7 +64,6 @@ class VaultTab(ttk.Frame):
         self.master_entry.pack()
         self.master_entry.bind('<Return>', lambda e: self._unlock())
 
-        # Confirm password (only for setup)
         self.confirm_frame = ttk.Frame(self.login_frame)
         self.confirm_var = tk.StringVar()
 
@@ -81,12 +73,10 @@ class VaultTab(ttk.Frame):
             self.confirm_entry = ttk.Entry(self.confirm_frame, textvariable=self.confirm_var, show='*', width=30)
             self.confirm_entry.pack()
 
-        # Login button
         btn_text = "Create Vault" if not self.storage.is_setup() else "Unlock"
         ttk.Button(self.login_frame, text=btn_text, command=self._unlock).pack(pady=20)
 
     def _create_vault_widgets(self):
-        # Header
         header_frame = ttk.Frame(self.vault_frame)
         header_frame.pack(fill='x', padx=10, pady=10)
 
@@ -94,7 +84,6 @@ class VaultTab(ttk.Frame):
 
         ttk.Button(header_frame, text="Lock", command=self._lock).pack(side='right')
 
-        # Search frame
         search_frame = ttk.Frame(self.vault_frame)
         search_frame.pack(fill='x', padx=10, pady=(0, 10))
 
@@ -103,14 +92,11 @@ class VaultTab(ttk.Frame):
         self.search_var.trace_add('write', self._on_search)
         ttk.Entry(search_frame, textvariable=self.search_var, width=30).pack(side='left', padx=5)
 
-        # Add button
         ttk.Button(search_frame, text="+ Add New", command=self._show_add_dialog).pack(side='right')
 
-        # Entries list
         list_frame = ttk.Frame(self.vault_frame)
         list_frame.pack(fill='both', expand=True, padx=10)
 
-        # Treeview
         columns = ('site', 'label', 'username')
         self.tree = ttk.Treeview(list_frame, columns=columns, show='headings', selectmode='browse')
         self.tree.heading('site', text='Site')
@@ -128,15 +114,14 @@ class VaultTab(ttk.Frame):
 
         self.tree.bind('<<TreeviewSelect>>', self._on_select)
 
-        # Action buttons
         action_frame = ttk.Frame(self.vault_frame)
         action_frame.pack(fill='x', padx=10, pady=10)
 
         ttk.Button(action_frame, text="Copy Password", command=self._copy_password).pack(side='left', padx=(0, 5))
+        ttk.Button(action_frame, text="Copy Username", command=self._copy_username).pack(side='left', padx=(0, 5))
         ttk.Button(action_frame, text="Edit", command=self._show_edit_dialog).pack(side='left', padx=(0, 5))
         ttk.Button(action_frame, text="Delete", command=self._delete_entry).pack(side='left')
 
-        # Status bar
         self.status_var = tk.StringVar(value="")
         ttk.Label(self.vault_frame, textvariable=self.status_var).pack(pady=5)
 
@@ -158,7 +143,6 @@ class VaultTab(ttk.Frame):
             return
 
         if not self.storage.is_setup():
-            # First time setup
             if password != self.confirm_var.get():
                 messagebox.showerror("Error", "Passwords do not match")
                 return
@@ -170,16 +154,19 @@ class VaultTab(ttk.Frame):
             self.storage.setup_master(password)
             self.unlocked = True
             self._show_vault()
-            self._reset_lock_timer()
+            self._start_auto_lock()
             messagebox.showinfo("Success", "Vault created successfully!")
         else:
-            # Unlock existing vault
             if self.storage.unlock(password):
                 self.unlocked = True
                 self._show_vault()
-                self._reset_lock_timer()
+                self._start_auto_lock()
             else:
                 messagebox.showerror("Error", "Incorrect password")
+
+    def _start_auto_lock(self):
+        self._bind_activity_events()
+        self._reset_lock_timer()
 
     def _lock(self):
         self.unlocked = False
@@ -188,15 +175,14 @@ class VaultTab(ttk.Frame):
         if self._lock_timer is not None:
             self.after_cancel(self._lock_timer)
             self._lock_timer = None
+        self._unbind_activity_events()
         self._show_login()
 
     def lock_vault(self):
-        """Public method to lock the vault (called when switching tabs)."""
         if self.unlocked:
             self._lock()
 
     def _refresh_list(self, entries=None):
-        # Clear existing items
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -217,7 +203,6 @@ class VaultTab(ttk.Frame):
         self._refresh_list(entries)
 
     def _on_select(self, event):
-        # Could show details here if needed
         pass
 
     def _get_selected_entry(self):
@@ -228,7 +213,6 @@ class VaultTab(ttk.Frame):
         item = self.tree.item(selection[0])
         site, label, username = item['values']
 
-        # Find full entry
         for entry in self.storage.get_all_entries():
             if entry['site'] == site and entry['username'] == username:
                 return entry
@@ -242,6 +226,14 @@ class VaultTab(ttk.Frame):
         else:
             messagebox.showwarning("Warning", "Please select an entry")
 
+    def _copy_username(self):
+        entry = self._get_selected_entry()
+        if entry:
+            pyperclip.copy(entry['username'])
+            self.status_var.set(f"Copied username for {entry['site']}")
+        else:
+            messagebox.showwarning("Warning", "Please select an entry")
+
     def _show_add_dialog(self):
         dialog = tk.Toplevel(self)
         dialog.title("Add Password")
@@ -250,7 +242,6 @@ class VaultTab(ttk.Frame):
         dialog.grab_set()
         dialog.configure(bg='#1a1a1a')
 
-        # Center dialog on parent window
         dialog.update_idletasks()
         x = self.winfo_rootx() + (self.winfo_width() - 420) // 2
         y = self.winfo_rooty() + (self.winfo_height() - 260) // 2
@@ -307,7 +298,6 @@ class VaultTab(ttk.Frame):
         dialog.grab_set()
         dialog.configure(bg='#1a1a1a')
 
-        # Center dialog on parent window
         dialog.update_idletasks()
         x = self.winfo_rootx() + (self.winfo_width() - 420) // 2
         y = self.winfo_rooty() + (self.winfo_height() - 260) // 2

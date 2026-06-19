@@ -6,7 +6,6 @@ from ..core.strength import StrengthChecker
 
 
 class GeneratorTab(ttk.Frame):
-    """Password Generator tab UI."""
 
     def __init__(self, parent, theme_colors: dict):
         super().__init__(parent)
@@ -16,11 +15,9 @@ class GeneratorTab(ttk.Frame):
         self._create_widgets()
 
     def _create_widgets(self):
-        # Title
         title = ttk.Label(self, text="Password Generator", font=('Segoe UI', 16, 'bold'))
         title.pack(pady=(0, 20))
 
-        # Length slider frame
         length_frame = ttk.Frame(self)
         length_frame.pack(fill='x', padx=20, pady=5)
 
@@ -36,7 +33,6 @@ class GeneratorTab(ttk.Frame):
         )
         self.length_slider.pack(side='left', fill='x', expand=True, padx=(10, 10))
 
-        # Character options frame
         options_frame = ttk.LabelFrame(self, text="Character Options", padding=10)
         options_frame.pack(fill='x', padx=20, pady=10)
 
@@ -50,11 +46,9 @@ class GeneratorTab(ttk.Frame):
         ttk.Checkbutton(options_frame, text="Numbers (0-9)", variable=self.numbers_var).pack(anchor='w')
         ttk.Checkbutton(options_frame, text="Symbols (!@#$%^&*)", variable=self.symbols_var).pack(anchor='w')
 
-        # Generate button
         generate_btn = ttk.Button(self, text="Generate Password", command=self._generate)
         generate_btn.pack(pady=15)
 
-        # Password display frame
         display_frame = ttk.LabelFrame(self, text="Generated Password", padding=10)
         display_frame.pack(fill='x', padx=20, pady=10)
 
@@ -68,7 +62,6 @@ class GeneratorTab(ttk.Frame):
         copy_btn = ttk.Button(display_frame, text="Copy", command=self._copy_password)
         copy_btn.pack(side='right')
 
-        # Strength indicator
         strength_frame = ttk.LabelFrame(self, text="Strength", padding=10)
         strength_frame.pack(fill='x', padx=20, pady=10)
 
@@ -105,7 +98,6 @@ class GeneratorTab(ttk.Frame):
         self._last_strength_text = f"Strength: {result['label']} ({result['score']}/100)"
         self.strength_label.config(text=self._last_strength_text)
 
-        # Update strength bar
         self.strength_bar.delete('all')
         bar_width = self.strength_bar.winfo_width() * (result['score'] / 100)
         self.strength_bar.create_rectangle(0, 0, bar_width, 20, fill=result['color'], outline='')
