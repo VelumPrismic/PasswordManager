@@ -1,8 +1,8 @@
-# 🔐 Password Manager
+# Password Manager
 
 A secure password management app built with Python and Tkinter. It comes with a password generator, strength checker, and an encrypted vault to store all your credentials locally.
 
-## 📦 Technologies Used
+## Technologies Used
 
 - `Python 3`
 - `Tkinter`
@@ -10,7 +10,7 @@ A secure password management app built with Python and Tkinter. It comes with a 
 - `Pyperclip`
 - `PyInstaller`
 
-## 🦄 Features
+## Features
 
 Here's what you can do with Password Manager:
 
@@ -28,30 +28,30 @@ Here's what you can do with Password Manager:
 
 - **Copy Quickly**: Copy passwords or usernames individually with dedicated buttons.
 
-## 📚 What I Learned
+## What I Learned
 
-### 🔐 Cryptography and Security
+### Cryptography and Security
 
 - **Key Derivation**: I learned how PBKDF2 works to derive encryption keys from passwords, making brute-force attacks harder.
 - **Fernet Encryption**: Understanding symmetric encryption with Fernet and how it handles AES-128-CBC under the hood.
 - **Password Hashing**: Salting and hashing passwords properly before storing them, and why that matters.
 
-### 🧩 Tkinter GUI Development
+### Tkinter GUI Development
 
 - **Theming**: Customizing ttk styles to create a dark theme without external libraries.
 - **Layout Management**: Using grid and pack together effectively for clean dialog layouts.
 - **Event Handling**: Binding mouse, keyboard, and notebook tab-change events for auto-lock behavior.
 
-### ⚙️ Password Strength Analysis
+### Password Strength Analysis
 
 - **Entropy Calculation**: Computing password entropy based on character set size and length.
 - **Pattern Detection**: Using regex to find sequential characters, repeated characters, and common passwords.
 
-### 📦 Packaging with PyInstaller
+### Packaging with PyInstaller
 
 - **Onefile vs Onedir**: The tradeoffs between a single executable and a folder-based build for startup speed.
 
-## 🚦 Running the Project
+## Running the Project
 
 To run the project in your local environment, follow these steps:
 
@@ -60,7 +60,7 @@ To run the project in your local environment, follow these steps:
 3. Run `python main.py` to start the application.
 4. The app window will open. Create a master password on first launch to set up your vault.
 
-## 🏗️ Building the Executable
+## Building the Executable
 
 To build a standalone `.exe` file:
 
