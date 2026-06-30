@@ -6,14 +6,19 @@ from .vault import VaultTab
 
 
 THEME = {
-    'bg': '#1a1a1a',
-    'bg_light': '#2a2a2a',
-    'fg': '#b0b0b0',
-    'accent': '#4a90d9',
-    'success': '#6b9b6b',
-    'warning': '#c9a84c',
-    'error': '#c94c4c',
-    'border': '#353535',
+    'bg': '#1e2025',
+    'bg_light': '#282c34',
+    'bg_card': '#2e3440',
+    'fg': '#c8ccd4',
+    'fg_dim': '#7a8094',
+    'accent': '#5294e2',
+    'accent_hover': '#6baaf5',
+    'success': '#5a9e6f',
+    'warning': '#d4a44c',
+    'error': '#bf6060',
+    'border': '#3a3f4b',
+    'border_light': '#454c5c',
+    'selected': '#3b4252',
 }
 
 
@@ -34,28 +39,89 @@ class PasswordManagerApp:
         style.theme_use('clam')
 
         style.configure('TFrame', background=THEME['bg'])
-        style.configure('TLabel', background=THEME['bg'], foreground=THEME['fg'])
-        style.configure('TButton', background=THEME['border'], foreground=THEME['fg'])
-        style.configure('TCheckbutton', background=THEME['bg'], foreground=THEME['fg'])
-        style.configure('TLabelframe', background=THEME['bg'], foreground=THEME['fg'])
-        style.configure('TLabelframe.Label', background=THEME['bg'], foreground=THEME['fg'])
-        style.configure('Treeview', background=THEME['bg_light'], foreground=THEME['fg'],
-                        fieldbackground=THEME['bg_light'], borderwidth=0)
-        style.configure('Treeview.Heading', background=THEME['border'], foreground=THEME['fg'])
-        style.map('Treeview', background=[('selected', '#3a3a3a')],
-                  foreground=[('selected', THEME['fg'])])
-
-        style.configure('TEntry', fieldbackground=THEME['bg_light'], foreground=THEME['fg'],
-                        borderwidth=0, relief='flat', insertcolor=THEME['fg'])
-
-        style.configure('TNotebook', background=THEME['bg'], borderwidth=0)
-        style.configure('TNotebook.Tab', background=THEME['bg_light'], foreground=THEME['fg'],
-                        padding=[15, 5])
+        style.configure('TLabel', background=THEME['bg'], foreground=THEME['fg'],
+                        font=('Segoe UI', 10))
+        style.configure('TButton',
+                        background=THEME['bg_card'],
+                        foreground=THEME['fg'],
+                        borderwidth=1,
+                        relief='flat',
+                        padding=[10, 5],
+                        font=('Segoe UI', 9))
+        style.map('TButton',
+                  background=[('active', THEME['border_light']), ('pressed', THEME['selected'])],
+                  foreground=[('active', '#ffffff')])
+        style.configure('Accent.TButton',
+                        background=THEME['accent'],
+                        foreground='#ffffff',
+                        borderwidth=0,
+                        relief='flat',
+                        padding=[12, 6],
+                        font=('Segoe UI', 9, 'bold'))
+        style.map('Accent.TButton',
+                  background=[('active', THEME['accent_hover']), ('pressed', '#4080cc')],
+                  foreground=[('active', '#ffffff')])
+        style.configure('TCheckbutton', background=THEME['bg'], foreground=THEME['fg'],
+                        font=('Segoe UI', 10))
+        style.map('TCheckbutton', background=[('active', THEME['bg'])])
+        style.configure('TLabelframe', background=THEME['bg'],
+                        bordercolor=THEME['border'], relief='flat', borderwidth=1)
+        style.configure('TLabelframe.Label', background=THEME['bg'],
+                        foreground=THEME['fg_dim'], font=('Segoe UI', 9))
+        style.configure('Treeview',
+                        background=THEME['bg_card'],
+                        foreground=THEME['fg'],
+                        fieldbackground=THEME['bg_card'],
+                        borderwidth=0,
+                        rowheight=28,
+                        font=('Segoe UI', 10))
+        style.configure('Treeview.Heading',
+                        background=THEME['bg_light'],
+                        foreground=THEME['fg_dim'],
+                        borderwidth=0,
+                        relief='flat',
+                        font=('Segoe UI', 9, 'bold'))
+        style.map('Treeview',
+                  background=[('selected', THEME['selected'])],
+                  foreground=[('selected', '#ffffff')])
+        style.map('Treeview.Heading',
+                  background=[('active', THEME['border'])])
+        style.configure('TEntry',
+                        fieldbackground=THEME['bg_card'],
+                        foreground=THEME['fg'],
+                        borderwidth=1,
+                        relief='flat',
+                        insertcolor=THEME['fg'],
+                        padding=[6, 4],
+                        font=('Segoe UI', 10))
+        style.map('TEntry',
+                  fieldbackground=[('focus', THEME['bg_card'])],
+                  bordercolor=[('focus', THEME['accent'])])
+        style.configure('TNotebook',
+                        background=THEME['bg'],
+                        borderwidth=0,
+                        tabmargins=[0, 0, 0, 0])
+        style.configure('TNotebook.Tab',
+                        background=THEME['bg_light'],
+                        foreground=THEME['fg_dim'],
+                        padding=[18, 8],
+                        font=('Segoe UI', 10),
+                        borderwidth=0)
         style.map('TNotebook.Tab',
-                  background=[('selected', '#3a3a3a')],
-                  foreground=[('selected', THEME['fg'])])
-
-        style.configure('TScale', background=THEME['bg'], troughcolor=THEME['border'])
+                  background=[('selected', THEME['bg']), ('active', THEME['bg_card'])],
+                  foreground=[('selected', THEME['accent']), ('active', THEME['fg'])])
+        style.configure('TScale',
+                        background=THEME['bg'],
+                        troughcolor=THEME['border'],
+                        sliderrelief='flat')
+        style.configure('TScrollbar',
+                        background=THEME['bg_light'],
+                        troughcolor=THEME['bg'],
+                        borderwidth=0,
+                        arrowcolor=THEME['fg_dim'],
+                        relief='flat')
+        style.map('TScrollbar',
+                  background=[('active', THEME['border_light'])])
 
     def _create_widgets(self):
         self.notebook = ttk.Notebook(self.root)

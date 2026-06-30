@@ -46,65 +46,86 @@ class VaultTab(ttk.Frame):
             messagebox.showinfo("Auto-Locked", "Vault locked due to inactivity.")
 
     def _create_login_widgets(self):
-        title = ttk.Label(self.login_frame, text="Password Vault", font=('Segoe UI', 16, 'bold'))
-        title.pack(pady=(40, 20))
+        spacer = ttk.Frame(self.login_frame)
+        spacer.pack(expand=True)
+
+        card = ttk.Frame(self.login_frame)
+        card.pack(padx=40, pady=10)
+
+        icon_label = ttk.Label(card, text="🔐", font=('Segoe UI', 32))
+        icon_label.pack(pady=(0, 10))
+
+        ttk.Label(card, text="Password Vault",
+                  font=('Segoe UI', 16, 'bold'), foreground=self.theme['fg']).pack()
 
         if not self.storage.is_setup():
-            ttk.Label(self.login_frame, text="Create Master Password", font=('Segoe UI', 11)).pack(pady=(0, 10))
-            ttk.Label(self.login_frame, text="(This will be used to unlock your vault)").pack(pady=(0, 20))
+            ttk.Label(card, text="Create a master password to get started",
+                      font=('Segoe UI', 9), foreground=self.theme['fg_dim']).pack(pady=(4, 20))
         else:
-            ttk.Label(self.login_frame, text="Enter Master Password", font=('Segoe UI', 11)).pack(pady=20)
+            ttk.Label(card, text="Enter your master password to unlock",
+                      font=('Segoe UI', 9), foreground=self.theme['fg_dim']).pack(pady=(4, 20))
 
-        input_frame = ttk.Frame(self.login_frame)
-        input_frame.pack(pady=5)
+        fields_frame = ttk.Frame(card)
+        fields_frame.pack(fill='x', pady=4)
 
-        ttk.Label(input_frame, text="Password:").pack(anchor='w')
+        ttk.Label(fields_frame, text="Master Password",
+                  font=('Segoe UI', 9), foreground=self.theme['fg_dim']).pack(anchor='w')
         self.master_password_var = tk.StringVar()
-        self.master_entry = ttk.Entry(input_frame, textvariable=self.master_password_var, show='*', width=30)
-        self.master_entry.pack()
+        self.master_entry = ttk.Entry(fields_frame, textvariable=self.master_password_var,
+                                      show='*', width=32)
+        self.master_entry.pack(fill='x', pady=(3, 0))
         self.master_entry.bind('<Return>', lambda e: self._unlock())
 
-        self.confirm_frame = ttk.Frame(self.login_frame)
+        self.confirm_frame = ttk.Frame(card)
         self.confirm_var = tk.StringVar()
 
         if not self.storage.is_setup():
-            self.confirm_frame.pack(pady=5)
-            ttk.Label(self.confirm_frame, text="Confirm Password:").pack(anchor='w')
-            self.confirm_entry = ttk.Entry(self.confirm_frame, textvariable=self.confirm_var, show='*', width=30)
-            self.confirm_entry.pack()
+            self.confirm_frame.pack(fill='x', pady=(10, 0))
+            ttk.Label(self.confirm_frame, text="Confirm Password",
+                      font=('Segoe UI', 9), foreground=self.theme['fg_dim']).pack(anchor='w')
+            self.confirm_entry = ttk.Entry(self.confirm_frame, textvariable=self.confirm_var,
+                                           show='*', width=32)
+            self.confirm_entry.pack(fill='x', pady=(3, 0))
 
-        btn_text = "Create Vault" if not self.storage.is_setup() else "Unlock"
-        ttk.Button(self.login_frame, text=btn_text, command=self._unlock).pack(pady=20)
+        btn_text = "Create Vault" if not self.storage.is_setup() else "Unlock Vault"
+        ttk.Button(card, text=btn_text, command=self._unlock,
+                   style='Accent.TButton').pack(fill='x', pady=(20, 0))
+
+        spacer2 = ttk.Frame(self.login_frame)
+        spacer2.pack(expand=True)
 
     def _create_vault_widgets(self):
         header_frame = ttk.Frame(self.vault_frame)
-        header_frame.pack(fill='x', padx=10, pady=10)
+        header_frame.pack(fill='x', padx=16, pady=(14, 8))
 
-        ttk.Label(header_frame, text="Your Passwords", font=('Segoe UI', 14, 'bold')).pack(side='left')
-
+        ttk.Label(header_frame, text="Your Passwords",
+                  font=('Segoe UI', 14, 'bold'), foreground=self.theme['fg']).pack(side='left')
         ttk.Button(header_frame, text="Lock", command=self._lock).pack(side='right')
 
-        search_frame = ttk.Frame(self.vault_frame)
-        search_frame.pack(fill='x', padx=10, pady=(0, 10))
+        toolbar_frame = ttk.Frame(self.vault_frame)
+        toolbar_frame.pack(fill='x', padx=16, pady=(0, 8))
 
-        ttk.Label(search_frame, text="Search:").pack(side='left')
         self.search_var = tk.StringVar()
         self.search_var.trace_add('write', self._on_search)
-        ttk.Entry(search_frame, textvariable=self.search_var, width=30).pack(side='left', padx=5)
+        search_entry = ttk.Entry(toolbar_frame, textvariable=self.search_var, width=28)
+        search_entry.pack(side='left')
+        ttk.Label(toolbar_frame, text="  🔍",
+                  font=('Segoe UI', 10), foreground=self.theme['fg_dim']).pack(side='left')
 
-        ttk.Button(search_frame, text="+ Add New", command=self._show_add_dialog).pack(side='right')
+        ttk.Button(toolbar_frame, text="+ Add New",
+                   command=self._show_add_dialog, style='Accent.TButton').pack(side='right')
 
         list_frame = ttk.Frame(self.vault_frame)
-        list_frame.pack(fill='both', expand=True, padx=10)
+        list_frame.pack(fill='both', expand=True, padx=16)
 
         columns = ('site', 'label', 'username')
         self.tree = ttk.Treeview(list_frame, columns=columns, show='headings', selectmode='browse')
         self.tree.heading('site', text='Site')
         self.tree.heading('label', text='Label')
         self.tree.heading('username', text='Username')
-        self.tree.column('site', width=150)
-        self.tree.column('label', width=100)
-        self.tree.column('username', width=150)
+        self.tree.column('site', width=160, minwidth=100)
+        self.tree.column('label', width=110, minwidth=60)
+        self.tree.column('username', width=160, minwidth=100)
 
         scrollbar = ttk.Scrollbar(list_frame, orient='vertical', command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -115,15 +136,21 @@ class VaultTab(ttk.Frame):
         self.tree.bind('<<TreeviewSelect>>', self._on_select)
 
         action_frame = ttk.Frame(self.vault_frame)
-        action_frame.pack(fill='x', padx=10, pady=10)
+        action_frame.pack(fill='x', padx=16, pady=(8, 4))
 
-        ttk.Button(action_frame, text="Copy Password", command=self._copy_password).pack(side='left', padx=(0, 5))
-        ttk.Button(action_frame, text="Copy Username", command=self._copy_username).pack(side='left', padx=(0, 5))
-        ttk.Button(action_frame, text="Edit", command=self._show_edit_dialog).pack(side='left', padx=(0, 5))
-        ttk.Button(action_frame, text="Delete", command=self._delete_entry).pack(side='left')
+        ttk.Button(action_frame, text="Copy Password",
+                   command=self._copy_password).pack(side='left', padx=(0, 6))
+        ttk.Button(action_frame, text="Copy Username",
+                   command=self._copy_username).pack(side='left', padx=(0, 6))
+        ttk.Button(action_frame, text="Edit",
+                   command=self._show_edit_dialog).pack(side='left', padx=(0, 6))
+        ttk.Button(action_frame, text="Delete",
+                   command=self._delete_entry).pack(side='left')
 
         self.status_var = tk.StringVar(value="")
-        ttk.Label(self.vault_frame, textvariable=self.status_var).pack(pady=5)
+        ttk.Label(self.vault_frame, textvariable=self.status_var,
+                  font=('Segoe UI', 9), foreground=self.theme['fg_dim']).pack(
+            anchor='w', padx=16, pady=(2, 8))
 
     def _show_login(self):
         self.vault_frame.pack_forget()
@@ -234,38 +261,61 @@ class VaultTab(ttk.Frame):
         else:
             messagebox.showwarning("Warning", "Please select an entry")
 
-    def _show_add_dialog(self):
+    def _make_dialog(self, title, height=290):
         dialog = tk.Toplevel(self)
-        dialog.title("Add Password")
-        dialog.geometry("420x260")
+        dialog.title(title)
+        dialog.geometry(f"440x{height}")
         dialog.transient(self)
         dialog.grab_set()
-        dialog.configure(bg='#1a1a1a')
-
+        dialog.configure(bg=self.theme['bg'])
+        dialog.resizable(False, False)
         dialog.update_idletasks()
-        x = self.winfo_rootx() + (self.winfo_width() - 420) // 2
-        y = self.winfo_rooty() + (self.winfo_height() - 260) // 2
+        x = self.winfo_rootx() + (self.winfo_width() - 440) // 2
+        y = self.winfo_rooty() + (self.winfo_height() - height) // 2
         dialog.geometry(f"+{x}+{y}")
+        return dialog
 
-        main_frame = ttk.Frame(dialog, padding=20)
+    def _build_entry_form(self, parent, site='', username='', password='', label=''):
+        parent.columnconfigure(1, weight=1)
+
+        fields = [
+            ("Site", site),
+            ("Username", username),
+            ("Password", password),
+            ("Label", label),
+        ]
+        vars_ = []
+        for i, (lbl, val) in enumerate(fields):
+            ttk.Label(parent, text=lbl,
+                      font=('Segoe UI', 9), foreground=self.theme['fg_dim']).grid(
+                row=i * 2, column=0, columnspan=2, sticky='w', pady=(8 if i > 0 else 0, 2))
+            var = tk.StringVar(value=val)
+            show = '*' if lbl == "Password" else ''
+            entry = ttk.Entry(parent, textvariable=var, show=show)
+            entry.grid(row=i * 2 + 1, column=0, columnspan=2, sticky='ew', pady=(0, 0))
+            vars_.append(var)
+
+        hint = ttk.Label(parent, text="e.g., Personal, Work",
+                         font=('Segoe UI', 8), foreground=self.theme['fg_dim'])
+        hint.grid(row=7, column=0, columnspan=2, sticky='w', pady=(2, 0))
+
+        return vars_[0], vars_[1], vars_[2], vars_[3]
+
+    def _show_add_dialog(self):
+        dialog = self._make_dialog("Add Password", height=310)
+
+        main_frame = ttk.Frame(dialog, padding=(20, 16, 20, 16))
         main_frame.pack(fill='both', expand=True)
 
-        ttk.Label(main_frame, text="Site:", font=('Segoe UI', 10)).grid(row=0, column=0, sticky='w', pady=(0, 5))
-        site_var = tk.StringVar()
-        ttk.Entry(main_frame, textvariable=site_var, width=35).grid(row=0, column=1, pady=(0, 5), padx=(10, 0))
+        ttk.Label(main_frame, text="Add New Entry",
+                  font=('Segoe UI', 12, 'bold')).grid(row=0, column=0, columnspan=2, sticky='w', pady=(0, 6))
 
-        ttk.Label(main_frame, text="Username:", font=('Segoe UI', 10)).grid(row=1, column=0, sticky='w', pady=(0, 5))
-        username_var = tk.StringVar()
-        ttk.Entry(main_frame, textvariable=username_var, width=35).grid(row=1, column=1, pady=(0, 5), padx=(10, 0))
+        form_frame = ttk.Frame(main_frame)
+        form_frame.grid(row=1, column=0, columnspan=2, sticky='ew')
+        form_frame.columnconfigure(0, weight=1)
+        main_frame.columnconfigure(0, weight=1)
 
-        ttk.Label(main_frame, text="Password:", font=('Segoe UI', 10)).grid(row=2, column=0, sticky='w', pady=(0, 5))
-        password_var = tk.StringVar()
-        ttk.Entry(main_frame, textvariable=password_var, width=25).grid(row=2, column=1, sticky='w', pady=(0, 5), padx=(10, 0))
-
-        ttk.Label(main_frame, text="Label (optional):", font=('Segoe UI', 10)).grid(row=3, column=0, sticky='w', pady=(0, 5))
-        label_var = tk.StringVar()
-        ttk.Entry(main_frame, textvariable=label_var, width=35).grid(row=3, column=1, pady=(0, 5), padx=(10, 0))
-        ttk.Label(main_frame, text="e.g., Personal, Work", font=('Segoe UI', 8)).grid(row=4, column=1, sticky='w', padx=(10, 0))
+        site_var, username_var, password_var, label_var = self._build_entry_form(form_frame)
 
         def generate_password():
             pw = self.generator.generate()
@@ -273,17 +323,20 @@ class VaultTab(ttk.Frame):
 
         def save():
             if site_var.get() and username_var.get() and password_var.get():
-                self.storage.add_entry(site_var.get(), username_var.get(), password_var.get(), label_var.get())
+                self.storage.add_entry(site_var.get(), username_var.get(),
+                                       password_var.get(), label_var.get())
                 self._refresh_list()
                 dialog.destroy()
             else:
                 messagebox.showerror("Error", "All fields are required")
 
         btn_frame = ttk.Frame(main_frame)
-        btn_frame.grid(row=5, column=0, columnspan=2, pady=(15, 0))
+        btn_frame.grid(row=2, column=0, columnspan=2, pady=(16, 0), sticky='w')
 
-        ttk.Button(btn_frame, text="Generate", command=generate_password).pack(side='left', padx=(0, 10))
-        ttk.Button(btn_frame, text="Save", command=save).pack(side='left')
+        ttk.Button(btn_frame, text="Generate Password",
+                   command=generate_password).pack(side='left', padx=(0, 8))
+        ttk.Button(btn_frame, text="Save",
+                   command=save, style='Accent.TButton').pack(side='left')
 
     def _show_edit_dialog(self):
         entry = self._get_selected_entry()
@@ -291,37 +344,26 @@ class VaultTab(ttk.Frame):
             messagebox.showwarning("Warning", "Please select an entry")
             return
 
-        dialog = tk.Toplevel(self)
-        dialog.title("Edit Password")
-        dialog.geometry("420x260")
-        dialog.transient(self)
-        dialog.grab_set()
-        dialog.configure(bg='#1a1a1a')
+        dialog = self._make_dialog("Edit Password", height=310)
 
-        dialog.update_idletasks()
-        x = self.winfo_rootx() + (self.winfo_width() - 420) // 2
-        y = self.winfo_rooty() + (self.winfo_height() - 260) // 2
-        dialog.geometry(f"+{x}+{y}")
-
-        main_frame = ttk.Frame(dialog, padding=20)
+        main_frame = ttk.Frame(dialog, padding=(20, 16, 20, 16))
         main_frame.pack(fill='both', expand=True)
 
-        ttk.Label(main_frame, text="Site:", font=('Segoe UI', 10)).grid(row=0, column=0, sticky='w', pady=(0, 5))
-        site_var = tk.StringVar(value=entry['site'])
-        ttk.Entry(main_frame, textvariable=site_var, width=35).grid(row=0, column=1, pady=(0, 5), padx=(10, 0))
+        ttk.Label(main_frame, text="Edit Entry",
+                  font=('Segoe UI', 12, 'bold')).grid(row=0, column=0, columnspan=2, sticky='w', pady=(0, 6))
 
-        ttk.Label(main_frame, text="Username:", font=('Segoe UI', 10)).grid(row=1, column=0, sticky='w', pady=(0, 5))
-        username_var = tk.StringVar(value=entry['username'])
-        ttk.Entry(main_frame, textvariable=username_var, width=35).grid(row=1, column=1, pady=(0, 5), padx=(10, 0))
+        form_frame = ttk.Frame(main_frame)
+        form_frame.grid(row=1, column=0, columnspan=2, sticky='ew')
+        form_frame.columnconfigure(0, weight=1)
+        main_frame.columnconfigure(0, weight=1)
 
-        ttk.Label(main_frame, text="Password:", font=('Segoe UI', 10)).grid(row=2, column=0, sticky='w', pady=(0, 5))
-        password_var = tk.StringVar(value=entry['password'])
-        ttk.Entry(main_frame, textvariable=password_var, width=25).grid(row=2, column=1, sticky='w', pady=(0, 5), padx=(10, 0))
-
-        ttk.Label(main_frame, text="Label (optional):", font=('Segoe UI', 10)).grid(row=3, column=0, sticky='w', pady=(0, 5))
-        label_var = tk.StringVar(value=entry.get('label', ''))
-        ttk.Entry(main_frame, textvariable=label_var, width=35).grid(row=3, column=1, pady=(0, 5), padx=(10, 0))
-        ttk.Label(main_frame, text="e.g., Personal, Work", font=('Segoe UI', 8)).grid(row=4, column=1, sticky='w', padx=(10, 0))
+        site_var, username_var, password_var, label_var = self._build_entry_form(
+            form_frame,
+            site=entry['site'],
+            username=entry['username'],
+            password=entry['password'],
+            label=entry.get('label', '')
+        )
 
         def generate_password():
             pw = self.generator.generate()
@@ -329,17 +371,20 @@ class VaultTab(ttk.Frame):
 
         def save():
             if site_var.get() and username_var.get() and password_var.get():
-                self.storage.update_entry(entry['id'], site_var.get(), username_var.get(), password_var.get(), label_var.get())
+                self.storage.update_entry(entry['id'], site_var.get(),
+                                          username_var.get(), password_var.get(), label_var.get())
                 self._refresh_list()
                 dialog.destroy()
             else:
                 messagebox.showerror("Error", "All fields are required")
 
         btn_frame = ttk.Frame(main_frame)
-        btn_frame.grid(row=5, column=0, columnspan=2, pady=(15, 0))
+        btn_frame.grid(row=2, column=0, columnspan=2, pady=(16, 0), sticky='w')
 
-        ttk.Button(btn_frame, text="Generate", command=generate_password).pack(side='left', padx=(0, 10))
-        ttk.Button(btn_frame, text="Save", command=save).pack(side='left')
+        ttk.Button(btn_frame, text="Generate Password",
+                   command=generate_password).pack(side='left', padx=(0, 8))
+        ttk.Button(btn_frame, text="Save",
+                   command=save, style='Accent.TButton').pack(side='left')
 
     def _delete_entry(self):
         entry = self._get_selected_entry()
